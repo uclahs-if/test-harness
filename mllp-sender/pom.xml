@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
+         ">
+
+    <modelVersion>4.0.0</modelVersion>
+
+
+
+    <parent>
+        <groupId>edu.ucla.mednet.iss.it.camel.test.harness</groupId>
+        <artifactId>test-harness</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+
+    <artifactId>mllp-sender</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-maven-plugin</artifactId>
+                <version>${camel.version}</version>
+                <configuration>
+                    <loggingLevel>INFO</loggingLevel>
+                    <mainClass>edu.ucla.mednet.iss.it.camel.test.harness.mllp.sender.MainApp</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

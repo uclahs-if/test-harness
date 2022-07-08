@@ -1,0 +1,11 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Start test and attach Camel Debugger",
+			"type": "apache.camel",
+			"request": "attach",
+			"preLaunchTask": "Start test with camel.debug profile" // must reference the label of the VS Code task previously created
+		}
+	]
+}
