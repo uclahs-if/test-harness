@@ -1,10 +1,15 @@
 package edu.ucla.mednet.iss.it.camel.test.harness.mllp.sender;
 
 import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.dataset.SimpleDataSet;
+import org.apache.camel.component.mllp.MllpAcknowledgementException;
+import org.apache.camel.component.mllp.MllpAcknowledgementReceiveException;
+import org.apache.camel.model.OnExceptionDefinition;
 import org.apache.camel.model.ProcessorDefinition;
 
 
@@ -19,7 +24,7 @@ public class MllpSenderRouteBuilder extends RouteBuilder {
   Integer produceDelay = 0;
   String mllpHost = "localhost";
   Integer mllpPort = 7777;
-  int repeatCount = 1000;
+  int repeatCount = 100;
   int throughputLoggerGroupSize = 1;
 
   public MllpSenderRouteBuilder() {
@@ -38,31 +43,18 @@ public class MllpSenderRouteBuilder extends RouteBuilder {
             .allowRedeliveryWhileStopping(false)
     );
 
-    onException(ConnectException.class)
-        .redeliveryDelay(1000)
-        .maximumRedeliveryDelay(15000)
-        .backOffMultiplier(2)
-        .maximumRedeliveries(-1)
-        .logContinued(true)
-        .logExhausted(true)
-        .logExhaustedMessageHistory(false)
-        .logHandled(true)
-        .logRetryAttempted(true)
-        .retryAttemptedLogLevel(LoggingLevel.WARN)
-        .toF("log:%s-connect-ex?level=WARN", routeId)
-    ;
-
-    /*
-    onException(ReadTimeoutException.class)
-        .handled(true)
-        .logHandled(true)
-        .logExhaustedMessageHistory(false)
-        .toF("log:%s-readtimeout-ex?level=WARN", routeId)
-    ;
-    */
-
-
-
+    OnExceptionDefinition retryForeverRedeliveryHandler =
+        onException(ConnectException.class, SocketException.class, SocketTimeoutException.class, MllpAcknowledgementException.class).id(routeId + ": Retry Forever Handler")
+            .handled(false)
+            .maximumRedeliveries(-1)
+            .redeliveryDelay(1000)
+            .maximumRedeliveryDelay(15000)
+            .backOffMultiplier(2)
+            .logRetryAttempted(true)
+            .logContinued(true)
+            .logExhausted(true)
+            .retryAttemptedLogLevel(LoggingLevel.WARN)
+            .retriesExhaustedLogLevel(LoggingLevel.WARN);
 
     HL7TimestampAndMessageControlIdSequenceGenerator hl7TimestampAndMessageControlIdSequenceGenerator = new HL7TimestampAndMessageControlIdSequenceGenerator();
     hl7TimestampAndMessageControlIdSequenceGenerator.setNextMessageControlId(10000);
